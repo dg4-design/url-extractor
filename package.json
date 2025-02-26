@@ -1,0 +1,26 @@
+{
+  "name": "url-clipper",
+  "version": "1.0.0",
+  "description": "URLを抽出してweblocファイルとして保存するツール",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "solid-js": "^1.8.16"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1",
+    "sass": "^1.72.0",
+    "vite": "^5.2.3",
+    "vite-plugin-solid": "^2.10.1",
+    "vitest": "^1.4.0",
+    "vitest-dom": "^0.1.1"
+  }
+}
