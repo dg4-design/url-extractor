@@ -1,0 +1,43 @@
+// カラー変数
+$primary-color: #4285f4;
+$primary-hover: #3367d6;
+$success-color: #34a853;
+$success-hover: #2d9146;
+$warning-color: #fbbc05;
+$warning-hover: #f9a825;
+$error-color: #ea4335;
+$bg-color: #f8f9fa;
+$card-bg: #ffffff;
+$text-color: #333333;
+$border-color: #e9ecef;
+
+// ダークテーマの変数
+$dark-primary-color: #5c9aff;
+$dark-primary-hover: #4285f4;
+$dark-success-color: #4caf50;
+$dark-success-hover: #43a047;
+$dark-warning-color: #ffca28;
+$dark-warning-hover: #ffb300;
+$dark-bg-color: #1a1a1a;
+$dark-card-bg: #242424;
+$dark-text-color: #e0e0e0;
+$dark-border-color: #333333;
+
+// ブレークポイント
+$mobile-breakpoint: 600px;
+
+// ボーダーラディウス
+$border-radius-sm: 8px;
+$border-radius-md: 12px;
+$border-radius-lg: 16px;
+
+// スペーシング
+$spacing-xs: 5px;
+$spacing-sm: 10px;
+$spacing-md: 15px;
+$spacing-lg: 20px;
+$spacing-xl: 25px;
+
+// トランジション
+$transition-default: all 0.3s ease;
+$transition-fast: all 0.2s ease;

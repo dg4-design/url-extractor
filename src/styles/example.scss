@@ -1,0 +1,4 @@
+// variables.scssから変数を使う場合
+.element {
+  color: variables.$primary-color;
+}
