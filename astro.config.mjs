@@ -6,9 +6,7 @@ export default defineConfig({
   integrations: [solid()],
   site: "https://dg4-design.github.io",
   base: "/url-extractor",
-  build: {
-    assets: "_assets",
-  },
+  outDir: "./dist",
   vite: {
     build: {
       target: "esnext",
