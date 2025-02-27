@@ -4,12 +4,12 @@
   "description": "URLを抽出してweblocファイルとして保存するツール",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "serve": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "deploy": "gh-pages -d dist"
+    "dev": "bun run --bun vite",
+    "build": "bun run --bun vite build",
+    "serve": "bun run --bun vite preview",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "deploy": "bun run gh-pages -d dist"
   },
   "dependencies": {
     "jszip": "^3.10.1",
