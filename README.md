@@ -39,10 +39,12 @@ bun run build
 bun run deploy
 ```
 
+または GitHub Actions を使用して GitHub Pages に自動デプロイできます。
+
 ## 🛠️ 技術スタック
 
-- [SolidJS](https://www.solidjs.com/) - UI フレームワーク
-- [Vite](https://vitejs.dev/) - ビルドツール
+- [Astro](https://astro.build/) - ウェブフレームワーク
+- [SolidJS](https://www.solidjs.com/) - UI コンポーネント
 - [Bun](https://bun.sh/) - JavaScript ランタイム
 - [JSZip](https://stuk.github.io/jszip/) - ZIP ファイル生成
 

@@ -2,6 +2,9 @@
 /dist/
 /node_modules/
 
+# Astro
+.astro/
+
 # キャッシュ
 .DS_Store
 .vite
