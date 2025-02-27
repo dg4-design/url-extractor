@@ -4,8 +4,11 @@ import solid from "@astrojs/solid-js";
 // https://astro.build/config
 export default defineConfig({
   integrations: [solid()],
-  site: "https://your-username.github.io",
+  site: "https://dg4-design.github.io",
   base: "/url-extractor",
+  build: {
+    assets: "_assets",
+  },
   vite: {
     build: {
       target: "esnext",
