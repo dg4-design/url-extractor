@@ -1,9 +1,9 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy
 
 on:
-  # main ブランチにプッシュしたときにワークフローをトリガー
+  # mainとdevelopブランチのプッシュ時にワークフローをトリガー
   push:
-    branches: [main]
+    branches: [main, develop]
   # Actions タブから手動実行できるようにする
   workflow_dispatch:
 
@@ -34,6 +34,8 @@ jobs:
 
   deploy:
     needs: build
+    # mainブランチの場合のみデプロイを実行
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
