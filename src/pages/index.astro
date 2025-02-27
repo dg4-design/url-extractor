@@ -1,10 +1,227 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import App from '../components/App';
+import "../styles/index.scss";
+import { extractUrls } from "../utils/urlExtractor";
+import { generateFileName, createXmlContent } from "../utils/weblocGenerator";
 ---
 
 <Layout title="URLクリッパー">
-  <div id="root">
-    <App client:only="solid" />
+  <div class="container">
+    <div class="header">
+      <h1>URLクリッパー</h1>
+    </div>
+
+    <div class="instructions">
+      <h3>📋 使い方</h3>
+      <p>テキストを入力するだけでURLを抽出して、webloc形式で保存できるよ！</p>
+    </div>
+
+    <div class="input-area">
+      <textarea id="urlInput" placeholder="テキストを入力してね..."></textarea>
+      <button id="clearButton">クリア</button>
+    </div>
+
+    <div id="statusMessage" class="status-message"></div>
+
+    <div id="stats" class="stats"></div>
+
+    <div id="urlList" class="url-list"></div>
+
+    <div id="downloadAllButtonContainer" class="download-all-container" style="display: none;">
+      <button id="downloadAllButton">すべてダウンロード（ZIP）</button>
+    </div>
+
+    <div id="toast" class="toast"></div>
   </div>
-</Layout> 
+</Layout>
+
+<script>
+  import { extractUrls } from "../utils/urlExtractor";
+  import { generateFileName, createXmlContent } from "../utils/weblocGenerator";
+  
+  let extractedUrls: string[] = [];
+  const urlInput = document.getElementById("urlInput") as HTMLTextAreaElement;
+  const clearButton = document.getElementById("clearButton") as HTMLButtonElement;
+  const statusMessage = document.getElementById("statusMessage") as HTMLDivElement;
+  const statsElement = document.getElementById("stats") as HTMLDivElement;
+  const urlListElement = document.getElementById("urlList") as HTMLDivElement;
+  const downloadAllButtonContainer = document.getElementById("downloadAllButtonContainer") as HTMLDivElement;
+  const downloadAllButton = document.getElementById("downloadAllButton") as HTMLButtonElement;
+  const toast = document.getElementById("toast") as HTMLDivElement;
+
+  let debounceTimer: ReturnType<typeof setTimeout>;
+
+  // 入力テキストからURLを抽出する処理
+  function processInput() {
+    statusMessage.innerHTML = '<div class="loading"></div> URLを探しているよ...';
+    statusMessage.className = "status-message";
+    
+    const urls = extractUrls(urlInput.value);
+    extractedUrls = urls;
+
+    if (urls.length === 0) {
+      statusMessage.textContent = "URLが見つからなかったよ...";
+      statusMessage.className = "status-message error";
+      urlListElement.innerHTML = "";
+      statsElement.innerHTML = "";
+      downloadAllButtonContainer.style.display = "none";
+      return;
+    }
+
+    statusMessage.textContent = `${urls.length}個のURLが見つかったよ！`;
+    statusMessage.className = "status-message success";
+    
+    updateStats();
+    renderUrlList();
+    downloadAllButtonContainer.style.display = "block";
+  }
+
+  // 統計情報の更新
+  function updateStats() {
+    const uniqueDomains = new Set(extractedUrls.map(url => {
+      try {
+        return new URL(url).hostname;
+      } catch (e) {
+        return "unknown";
+      }
+    }));
+
+    statsElement.innerHTML = `
+      <div>
+        <span>URL数: <strong>${extractedUrls.length}</strong></span>
+        <span>ドメイン数: <strong>${uniqueDomains.size}</strong></span>
+      </div>
+    `;
+  }
+
+  // URLリストの表示
+  function renderUrlList() {
+    urlListElement.innerHTML = "";
+    
+    extractedUrls.forEach(url => {
+      const listItem = document.createElement("div");
+      listItem.className = "url-item";
+      
+      const urlText = document.createElement("span");
+      urlText.className = "url-text";
+      urlText.textContent = url;
+      
+      const buttonsContainer = document.createElement("div");
+      buttonsContainer.className = "button-container";
+      
+      const downloadButton = document.createElement("button");
+      downloadButton.textContent = "ダウンロード";
+      downloadButton.onclick = () => downloadUrl(url);
+      
+      const removeParamsButton = document.createElement("button");
+      removeParamsButton.textContent = "パラメータ削除";
+      
+      try {
+        const urlObj = new URL(url);
+        if (urlObj.search) {
+          const cleanUrl = url.split('?')[0];
+          removeParamsButton.onclick = () => removeQueryParams(url, cleanUrl);
+        } else {
+          removeParamsButton.disabled = true;
+        }
+      } catch (e) {
+        removeParamsButton.disabled = true;
+      }
+      
+      buttonsContainer.appendChild(downloadButton);
+      buttonsContainer.appendChild(removeParamsButton);
+      
+      listItem.appendChild(urlText);
+      listItem.appendChild(buttonsContainer);
+      
+      urlListElement.appendChild(listItem);
+    });
+  }
+
+  // 単一URLのダウンロード
+  function downloadUrl(url: string) {
+    const fileName = generateFileName(url);
+    const content = createXmlContent(url);
+    downloadFile(`${fileName}.webloc`, content);
+    showToastMessage(`「${fileName}.webloc」を保存したよ！`);
+  }
+
+  // クエリパラメータを削除する処理
+  function removeQueryParams(originalUrl: string, cleanUrl: string) {
+    if (originalUrl === cleanUrl) {
+      showToastMessage("このURLにはクエリパラメータがないよ！");
+      return;
+    }
+
+    extractedUrls = extractedUrls.map(url => url === originalUrl ? cleanUrl : url);
+    renderUrlList();
+    updateStats();
+    showToastMessage("クエリパラメータを削除したよ！");
+  }
+
+  // すべてのURLをまとめてダウンロード
+  async function downloadAllUrls() {
+    if (extractedUrls.length === 0) return;
+
+    // JSZipをダイナミックインポート
+    const JSZipModule = await import("jszip");
+    const JSZip = JSZipModule.default;
+    const zip = new JSZip();
+
+    extractedUrls.forEach(url => {
+      const fileName = generateFileName(url);
+      const content = createXmlContent(url);
+      zip.file(`${fileName}.webloc`, content);
+    });
+
+    const blob = await zip.generateAsync({ type: "blob" });
+    downloadFile("all_urls.zip", blob);
+    showToastMessage("ZIPファイルを保存したよ！");
+  }
+
+  // 入力とリストをクリア
+  function clearAll() {
+    urlInput.value = "";
+    extractedUrls = [];
+    statusMessage.textContent = "";
+    statusMessage.className = "status-message";
+    urlListElement.innerHTML = "";
+    statsElement.innerHTML = "";
+    downloadAllButtonContainer.style.display = "none";
+    showToastMessage("すべてクリアしたよ！");
+  }
+
+  // ファイルダウンロード共通処理
+  function downloadFile(fileName: string, content: string | Blob) {
+    const blob = content instanceof Blob ? content : new Blob([content], { type: "application/xml" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  // トースト表示処理
+  function showToastMessage(message: string) {
+    toast.textContent = message;
+    toast.className = "toast show";
+    setTimeout(() => {
+      toast.className = "toast";
+    }, 3000);
+  }
+
+  // イベントリスナーの設定
+  clearButton.addEventListener("click", clearAll);
+  downloadAllButton.addEventListener("click", downloadAllUrls);
+  
+  urlInput.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    
+    if (!urlInput.value.trim()) {
+      clearAll();
+      return;
+    }
+    
+    debounceTimer = setTimeout(processInput, 500);
+  });
+</script> 
