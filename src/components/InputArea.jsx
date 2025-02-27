@@ -1,11 +1,10 @@
 const InputArea = (props) => {
   return (
     <>
-      <textarea id="inputText" placeholder="ここにURLを含むテキストを入力してね" value={props.value} onInput={(e) => props.onChange(e.target.value)} />
-
-      <div class="button-group">
+      <div class="input-container">
+        <textarea id="inputText" placeholder="ここにURLを含むテキストを入力してね" value={props.value} onInput={(e) => props.onChange(e.target.value)} />
         <button id="clearBtn" onClick={props.onClear}>
-          🧹 クリア
+          🧹
         </button>
       </div>
     </>

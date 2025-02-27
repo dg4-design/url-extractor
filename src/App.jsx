@@ -1,5 +1,4 @@
 import { createSignal, createEffect, onMount } from "solid-js";
-import ThemeToggle from "./components/ThemeToggle";
 import InputArea from "./components/InputArea";
 import StatusMessage from "./components/StatusMessage";
 import UrlList from "./components/UrlList";
@@ -51,6 +50,20 @@ const App = () => {
     showToastMessage(`「${fileName}.webloc」を保存したよ！`);
   };
 
+  // クエリパラメータを削除する処理
+  const removeQueryParams = (originalUrl, cleanUrl) => {
+    if (originalUrl === cleanUrl) {
+      showToastMessage("このURLにはクエリパラメータがないよ！");
+      return;
+    }
+
+    // 元のURLリストからオリジナルURLを探して置き換える
+    const updatedUrls = extractedUrls().map((url) => (url === originalUrl ? cleanUrl : url));
+
+    setExtractedUrls(updatedUrls);
+    showToastMessage("クエリパラメータを削除したよ！");
+  };
+
   // すべてのURLをまとめてダウンロード
   const downloadAllUrls = async () => {
     const urls = extractedUrls();
@@ -100,7 +113,6 @@ const App = () => {
     <div class="container">
       <div class="header">
         <h1>URLクリッパー</h1>
-        <ThemeToggle />
       </div>
 
       <div class="instructions">
@@ -114,7 +126,7 @@ const App = () => {
 
       <Stats urls={extractedUrls()} />
 
-      <UrlList urls={extractedUrls()} onDownload={downloadUrl} />
+      <UrlList urls={extractedUrls()} onDownload={downloadUrl} onRemoveParams={removeQueryParams} />
 
       {extractedUrls().length > 0 && <DownloadAllButton onClick={downloadAllUrls} />}
 
