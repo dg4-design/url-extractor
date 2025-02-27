@@ -4,6 +4,9 @@ on:
   # mainとdevelopブランチのプッシュ時にワークフローをトリガー
   push:
     branches: [main, develop]
+  # プルリクエスト時もテストを実行
+  pull_request:
+    branches: [main, develop]
   # Actions タブから手動実行できるようにする
   workflow_dispatch:
 
@@ -14,7 +17,22 @@ permissions:
   id-token: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install
+      - name: Run tests
+        run: bun test
+
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
