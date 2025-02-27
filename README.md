@@ -41,6 +41,14 @@ bun run deploy
 
 または GitHub Actions を使用して GitHub Pages に自動デプロイできます。
 
+## 🔄 開発フロー
+
+1. 開発は `develop` ブランチで行います
+2. 機能追加やバグ修正は機能ブランチ（例：`feature/new-function`）を作成して行います
+3. 開発完了後、`develop` ブランチにマージします（ビルドが実行されます）
+4. リリース準備ができたら、`develop` から `main` へプルリクエストを出します
+5. `main` へのマージ後、自動的にデプロイが実行されます
+
 ## 🛠️ 技術スタック
 
 - [Astro](https://astro.build/) - ウェブフレームワーク
